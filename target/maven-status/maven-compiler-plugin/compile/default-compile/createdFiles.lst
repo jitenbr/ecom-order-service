@@ -1,0 +1,9 @@
+com/secor/jdev25authservice/Credential.class
+com/secor/jdev25authservice/AppConfig.class
+com/secor/jdev25authservice/RedisConfig.class
+com/secor/jdev25authservice/Jdev25AuthServiceApplication.class
+com/secor/jdev25authservice/UserDetail.class
+com/secor/jdev25authservice/LoggingWebClientFilter.class
+com/secor/jdev25authservice/UserDetailView.class
+com/secor/jdev25authservice/CredentialRepository.class
+com/secor/jdev25authservice/MainRestController.class
