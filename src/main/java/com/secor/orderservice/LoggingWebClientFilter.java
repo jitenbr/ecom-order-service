@@ -1,4 +1,4 @@
-package com.secor.restroservice;
+package com.secor.orderservice;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

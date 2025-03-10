@@ -1,4 +1,4 @@
-package com.secor.restroservice;
+package com.secor.orderservice;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,10 +22,12 @@ public class AuthService
 
         log.info("Validating token within the AuthService: {}", token);
         log.info("Sending request to auth service to validate token: {}", token);
+
         String response = webClient.get()
                 .header("Authorization", token)
                 .retrieve()
                 .bodyToMono(String.class).block(); // Current Thread will pause till the final response comes back
+
         log.info("Response from auth service: {}", response);
         return response.equalsIgnoreCase("valid");
     }

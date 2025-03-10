@@ -1,4 +1,4 @@
-package com.secor.restroservice;
+package com.secor.orderservice;
 
 import org.springframework.boot.test.context.SpringBootTest;
 
