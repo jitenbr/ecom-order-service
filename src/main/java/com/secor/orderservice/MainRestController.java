@@ -1,5 +1,7 @@
 package com.secor.orderservice;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.netflix.discovery.converters.Auto;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -35,14 +37,22 @@ public class MainRestController {
     @Autowired
     RedisTemplate<String, Object> redisTemplate;
 
+    @Autowired
+    Producer producer;
+
+    @GetMapping("get/order/{orderid}")
+    public ResponseEntity<?> getOrder(@PathVariable String orderid,
+                                      @RequestHeader("Authorization") String token)
+    {
+
+    }
 
 
     @PostMapping("create/order")
     public ResponseEntity<?> createOrder(@RequestBody Order order,
                                          @RequestHeader("Authorization") String token,
                                          HttpServletRequest request,
-                                         HttpServletResponse response)
-    {
+                                         HttpServletResponse response) throws JsonProcessingException {
 
         // COOKIE VALIDATION LOGIC
         List<Cookie> cookieList = null;
@@ -69,7 +79,9 @@ public class MainRestController {
                 log.info("Token is valid: {}", token);
                 log.info("Proceeding to create order: {}", order);
                 order.setOrderid(String.valueOf(new Random().nextInt(1000)));
+                producer.publishOrderDatum(order.getOrderid(), "CREATE","Order Created Successfully with Order ID: " + order.getOrderid());
                 orderRepository.save(order);
+
                 log.info("Order saved successfully: {}", order);
 
                 log.info("Creating a New Payment Request");
@@ -122,7 +134,7 @@ public class MainRestController {
 
                 return ResponseEntity.ok("Request still under process...");
             }
-            else if(cacheResponseArray[0].equals("payment_id"))
+            else if(cacheResponseArray[0].equals("paymentid:orderid"))
             {
                 return ResponseEntity.ok("Order Created Successfully with Order ID: " + order.getOrderid() + " and Payment ID: " + cacheResponseArray[1]);
             }

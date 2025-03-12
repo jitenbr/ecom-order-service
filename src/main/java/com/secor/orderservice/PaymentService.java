@@ -1,18 +1,23 @@
 package com.secor.orderservice;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.client.reactive.ClientHttpRequest;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.BodyInserter;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
+import reactor.util.retry.Retry;
 
+import java.time.Duration;
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
 public class PaymentService
@@ -23,6 +28,12 @@ public class PaymentService
     RedisTemplate<String, Object> redisTemplate;
 
     @Autowired
+    OrderRepository orderRepository;
+
+    @Autowired
+    Producer producer;
+
+    @Autowired
     @Qualifier("payment-service-create-payment")
     WebClient webClient;
 
@@ -30,12 +41,17 @@ public class PaymentService
             {
                 log.info("Received request to create payment: {}", paymentRequest);
 
+                AtomicInteger retryCounter = new AtomicInteger(0);
+
 
                 Mono<String> paymentServiceResponse = webClient.post()
                         .header("Authorization", token)
                         .body(BodyInserters.fromValue(paymentRequest))
                         .retrieve()
-                        .bodyToMono(String.class);
+                        .bodyToMono(String.class).
+                        retryWhen(Retry.fixedDelay(5, Duration.ofSeconds(10))
+                                .doBeforeRetry(retrySignal -> {retryCounter.incrementAndGet(); log.info("Retrying..."+retryCounter);})
+                                .filter(throwable -> throwable instanceof RuntimeException));
 
                 log.info("Payment Request sent to the payment service");
 
@@ -49,7 +65,7 @@ public class PaymentService
 
                 // SECOND PART OF ASYNC REQUEST - TO SET UP THE HANDLER FOR THE EVENTUAL RESPONSE
 
-                redisTemplate.opsForValue().set(responseKey,"stage1 order-processing");
+                redisTemplate.opsForValue().set(responseKey,"stage1 orderid:"+paymentRequest.getOrder_id()); // this is the response from the payment service
                 log.info("Response Key set in the cache: {}", responseKey);
 
 
@@ -59,11 +75,52 @@ public class PaymentService
                             log.info(response+" from the payment service");
                             // MENU CREATION LOGIC TO BE IMPLEMENTED HERE
                             // AND PUT THE RESPONSE IN REDIS
-                            redisTemplate.opsForValue().set(responseKey,"payment_id "+response);
+
+                            log.info("Updating status of the Order to PAID");
+                            String stage1response  = (String)redisTemplate.opsForValue().get(responseKey);
+                            String[] stage1responseArray = stage1response.split(" ");
+                            String[] orderidarray = stage1responseArray[1].split(":");
+                            String orderid = orderidarray[1];
+                            Order order = orderRepository.findById(orderid).get();
+                            order.setStatus("PAID");
+                            orderRepository.save(order);
+                            try
+                            {
+                                producer.publishOrderDatum(order.getOrderid(),
+                                        "UPDATE",
+                                        "Order Status updated to PAID Successfully with Order ID: " + order.getOrderid());
+                            }
+                            catch (JsonProcessingException e)
+                            {
+                                throw new RuntimeException(e);
+                            }
+                            log.info("Updated status of the Order to PAID successfully");
+                            redisTemplate.opsForValue().set(responseKey,"paymentid:orderid "+response+":"+orderid);
                         },
                         error ->
                         {
                             log.info("error processing the response "+error.getMessage());
+
+                            log.info("Updating status of the Order to FAILED");
+                            String stage1response  = (String)redisTemplate.opsForValue().get(responseKey);
+                            String[] stage1responseArray = stage1response.split(" ");
+                            String[] orderidarray = stage1responseArray[1].split(":");
+                            String orderid = orderidarray[1];
+                            Order order = orderRepository.findById(orderid).get();
+                            order.setStatus("FAILED");
+                            orderRepository.save(order);
+                            try
+                            {
+                                producer.publishOrderDatum(order.getOrderid(),
+                                        "UPDATE",
+                                        "Order Status updated to FAILED with Order ID: " + order.getOrderid());
+                            }
+                            catch (JsonProcessingException e)
+                            {
+                                throw new RuntimeException(e);
+                            }
+                            log.info("Updated status of the Order to FAILED successfully");
+
                             redisTemplate.opsForValue().set(responseKey,"error "+error.getMessage());
                         });
 

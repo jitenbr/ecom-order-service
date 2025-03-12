@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 public class Producer
 {
     private static final Logger logger = LoggerFactory.getLogger(Producer.class);
-    private static final String TOPIC = "auth-events";
+    private static final String TOPIC = "order-events";
 
     @Autowired //DEPENDENCY INJECTION PROMISE FULFILLED AT RUNTIME
     private KafkaTemplate<String, String> kafkaTemplate ;
@@ -21,20 +21,26 @@ public class Producer
 //    @Autowired
 //    SocialEvent1 socialEvent1;
 
-    public void publishAuthDatum(String username, String description) throws JsonProcessingException // LOGIN | REGISTER
+    public void publishOrderDatum(String orderid,
+                                  String type,
+                                  String description) throws JsonProcessingException // LOGIN | REGISTER
     {
         //Analytic authDatum = new Analytic();
         //authDatum.setPrincipal(username);
         //authDatum.setType("AUTH");
         //authDatum.setDescription(description);
 
+        OrderDatum orderDatum = new OrderDatum();
+        orderDatum.setOrderid(orderid);
+        orderDatum.setType(type);
+        orderDatum.setDescription(description);
 //
         // convert to JSON
         ObjectMapper objectMapper = new ObjectMapper();
-        //String datum =  objectMapper.writeValueAsString(authDatum);
+        String datum =  objectMapper.writeValueAsString(orderDatum);
 //
-        //logger.info(String.format("#### -> Producing message -> %s", datum));
-        //this.kafkaTemplate.send(TOPIC, datum);
+        logger.info(String.format("#### -> Producing message -> %s", datum));
+        this.kafkaTemplate.send(TOPIC, datum);
     }
 
 }
