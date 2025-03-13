@@ -82,13 +82,16 @@ public class PaymentService
                             String[] orderidarray = stage1responseArray[1].split(":");
                             String orderid = orderidarray[1];
                             Order order = orderRepository.findById(orderid).get();
-                            order.setStatus("PAID");
+                            order.setStatus("PAYMENT PENDING");
+                            order.setPayment_id(response);
                             orderRepository.save(order);
                             try
                             {
                                 producer.publishOrderDatum(order.getOrderid(),
                                         "UPDATE",
-                                        "Order Status updated to PAID Successfully with Order ID: " + order.getOrderid());
+                                        "Order Status updated to PAYMENT PENDING and Payment ID: " + response + " with Order ID: " + order.getOrderid(),
+                                        order.getStatus(),
+                                        order.getPayment_id());
                             }
                             catch (JsonProcessingException e)
                             {
@@ -107,13 +110,15 @@ public class PaymentService
                             String[] orderidarray = stage1responseArray[1].split(":");
                             String orderid = orderidarray[1];
                             Order order = orderRepository.findById(orderid).get();
-                            order.setStatus("FAILED");
+                            order.setStatus("PAYMENT CREATION FAILED");
                             orderRepository.save(order);
                             try
                             {
                                 producer.publishOrderDatum(order.getOrderid(),
                                         "UPDATE",
-                                        "Order Status updated to FAILED with Order ID: " + order.getOrderid());
+                                        "Order Status updated to PAYMENT CREATION FAILED with Order ID: " + order.getOrderid(),
+                                        order.getStatus(),
+                                        order.getPayment_id());
                             }
                             catch (JsonProcessingException e)
                             {

@@ -23,7 +23,9 @@ public class Producer
 
     public void publishOrderDatum(String orderid,
                                   String type,
-                                  String description) throws JsonProcessingException // LOGIN | REGISTER
+                                  String description,
+                                  String status,
+                                  String paymentid) throws JsonProcessingException // LOGIN | REGISTER
     {
         //Analytic authDatum = new Analytic();
         //authDatum.setPrincipal(username);
@@ -34,6 +36,7 @@ public class Producer
         orderDatum.setOrderid(orderid);
         orderDatum.setType(type);
         orderDatum.setDescription(description);
+        orderDatum.setStatus(status);
 //
         // convert to JSON
         ObjectMapper objectMapper = new ObjectMapper();

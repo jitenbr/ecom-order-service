@@ -8,6 +8,8 @@ import lombok.Setter;
 public class OrderDatum {
 
     private String orderid;
+    private String paymentid;
     private String type;
     private String description;
+    private String status;
 }

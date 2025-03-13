@@ -41,10 +41,10 @@ public class MainRestController {
     Producer producer;
 
     @GetMapping("get/order/{orderid}")
-    public ResponseEntity<?> getOrder(@PathVariable String orderid,
-                                      @RequestHeader("Authorization") String token)
+    public ResponseEntity<?> getOrder(@PathVariable("orderid") String orderid)
     {
-
+        Order order = orderRepository.findById(orderid).get();
+        return ResponseEntity.ok(order);
     }
 
 
@@ -79,7 +79,12 @@ public class MainRestController {
                 log.info("Token is valid: {}", token);
                 log.info("Proceeding to create order: {}", order);
                 order.setOrderid(String.valueOf(new Random().nextInt(1000)));
-                producer.publishOrderDatum(order.getOrderid(), "CREATE","Order Created Successfully with Order ID: " + order.getOrderid());
+                order.setStatus("PROCESSING");
+                producer.publishOrderDatum(order.getOrderid(),
+                                                "CREATE",
+                        "Order Created Successfully with Order ID: " + order.getOrderid(),
+                        order.getStatus(),
+                        order.getPayment_id());
                 orderRepository.save(order);
 
                 log.info("Order saved successfully: {}", order);
