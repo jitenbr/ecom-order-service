@@ -8,11 +8,11 @@
         <version>3.3.3</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId>com.secor</groupId>
+    <groupId>com.jitenbr.ecom</groupId>
     <artifactId>order-service</artifactId>
     <version>prod-1</version>
     <name>order-service</name>
-    <description>restro-service</description>
+    <description>order-service</description>
     <url/>
     <licenses>
         <license/>
