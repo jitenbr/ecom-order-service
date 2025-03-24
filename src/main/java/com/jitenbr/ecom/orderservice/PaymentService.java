@@ -52,7 +52,7 @@ public class PaymentService
 
                 log.info("Payment Request sent to the payment service");
 
-                String responseKey = paymentRequest.getOrder_id()+(new Random().nextInt(1000)); // this is the key that we will return from this method
+                String responseKey = paymentRequest.getOrder_id() ; //+(new Random().nextInt(1000)); // this is the key that we will return from this method
 
                 log.info("Response Key generated: {}", responseKey);
                 // eventual response from the payment service will  come a bit later but we will  proceed with our thread execution
@@ -62,9 +62,8 @@ public class PaymentService
 
                 // SECOND PART OF ASYNC REQUEST - TO SET UP THE HANDLER FOR THE EVENTUAL RESPONSE
 
-                redisTemplate.opsForValue().set(responseKey,"stage1 orderid:"+paymentRequest.getOrder_id()); // this is the response from the payment service
+                redisTemplate.opsForValue().set(responseKey,"processing payment orderid:"+paymentRequest.getOrder_id()); // this is the response from the payment service
                 log.info("Response Key set in the cache: {}", responseKey);
-
 
                 paymentServiceResponse.subscribe(
                         (response) ->
@@ -74,10 +73,11 @@ public class PaymentService
                             // AND PUT THE RESPONSE IN REDIS
 
                             log.info("Updating status of the Order to PAID");
-                            String stage1response  = (String)redisTemplate.opsForValue().get(responseKey);
-                            String[] stage1responseArray = stage1response.split(" ");
-                            String[] orderidarray = stage1responseArray[1].split(":");
-                            String orderid = orderidarray[1];
+//                            String stage1response  = (String)redisTemplate.opsForValue().get(responseKey);
+//                            String[] stage1responseArray = stage1response.split(" ");
+//                            String[] orderidarray = stage1responseArray[1].split(":");
+//                            String orderid = orderidarray[1];
+                            String orderid = responseKey;
                             EcomOrder order = orderRepository.findById(orderid).get();
                             order.setStatus("PAYMENT PENDING");
                             order.setPayment_id(response);
@@ -102,10 +102,11 @@ public class PaymentService
                             log.info("error processing the response "+error.getMessage());
 
                             log.info("Updating status of the Order to FAILED");
-                            String stage1response  = (String)redisTemplate.opsForValue().get(responseKey);
-                            String[] stage1responseArray = stage1response.split(" ");
-                            String[] orderidarray = stage1responseArray[1].split(":");
-                            String orderid = orderidarray[1];
+//                            String stage1response  = (String)redisTemplate.opsForValue().get(responseKey);
+//                            String[] stage1responseArray = stage1response.split(" ");
+//                            String[] orderidarray = stage1responseArray[1].split(":");
+//                            String orderid = orderidarray[1];
+                            String orderid = responseKey;
                             EcomOrder order = orderRepository.findById(orderid).get();
                             order.setStatus("PAYMENT CREATION FAILED");
                             orderRepository.save(order);

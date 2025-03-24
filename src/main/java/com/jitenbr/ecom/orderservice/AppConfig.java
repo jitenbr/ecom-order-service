@@ -8,14 +8,16 @@ import org.springframework.web.reactive.function.client.WebClient;
 public class AppConfig {
 
 
-    @Bean(name = "auth-service-validate")
+    @Bean(name = "auth-service")
     public WebClient webClientAuthService(WebClient.Builder webClientBuilder)
     {
         return webClientBuilder
-                .baseUrl("http://localhost:8082/api/v1/validate")
+                .baseUrl("http://localhost:8082/api/v1")
                 .filter(new LoggingWebClientFilter())
                 .build();
     }
+
+
 
     @Bean(name = "payment-service-create-payment")
     public WebClient webClientPymntService(WebClient.Builder webClientBuilder)

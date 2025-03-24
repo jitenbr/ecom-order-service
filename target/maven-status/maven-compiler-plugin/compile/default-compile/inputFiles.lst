@@ -2,14 +2,11 @@ C:\Users\jitendra Brijwasi\Documents\GitHub\ecom-order-service\src\main\java\com
 C:\Users\jitendra Brijwasi\Documents\GitHub\ecom-order-service\src\main\java\com\jitenbr\ecom\orderservice\AuthService.java
 C:\Users\jitendra Brijwasi\Documents\GitHub\ecom-order-service\src\main\java\com\jitenbr\ecom\orderservice\EcomOrder.java
 C:\Users\jitendra Brijwasi\Documents\GitHub\ecom-order-service\src\main\java\com\jitenbr\ecom\orderservice\EcomOrderRepository.java
+C:\Users\jitendra Brijwasi\Documents\GitHub\ecom-order-service\src\main\java\com\jitenbr\ecom\orderservice\InventoryService.java
 C:\Users\jitendra Brijwasi\Documents\GitHub\ecom-order-service\src\main\java\com\jitenbr\ecom\orderservice\LoggingWebClientFilter.java
 C:\Users\jitendra Brijwasi\Documents\GitHub\ecom-order-service\src\main\java\com\jitenbr\ecom\orderservice\MainRestController.java
-C:\Users\jitendra Brijwasi\Documents\GitHub\ecom-order-service\src\main\java\com\jitenbr\ecom\orderservice\MenuItem.java
-C:\Users\jitendra Brijwasi\Documents\GitHub\ecom-order-service\src\main\java\com\jitenbr\ecom\orderservice\MenuItemRepository.java
-C:\Users\jitendra Brijwasi\Documents\GitHub\ecom-order-service\src\main\java\com\jitenbr\ecom\orderservice\Order.java
 C:\Users\jitendra Brijwasi\Documents\GitHub\ecom-order-service\src\main\java\com\jitenbr\ecom\orderservice\OrderDatum.java
 C:\Users\jitendra Brijwasi\Documents\GitHub\ecom-order-service\src\main\java\com\jitenbr\ecom\orderservice\OrderHelperService.java
-C:\Users\jitendra Brijwasi\Documents\GitHub\ecom-order-service\src\main\java\com\jitenbr\ecom\orderservice\OrderRepository.java
 C:\Users\jitendra Brijwasi\Documents\GitHub\ecom-order-service\src\main\java\com\jitenbr\ecom\orderservice\OrderServiceApplication.java
 C:\Users\jitendra Brijwasi\Documents\GitHub\ecom-order-service\src\main\java\com\jitenbr\ecom\orderservice\PaymentRequest.java
 C:\Users\jitendra Brijwasi\Documents\GitHub\ecom-order-service\src\main\java\com\jitenbr\ecom\orderservice\PaymentService.java

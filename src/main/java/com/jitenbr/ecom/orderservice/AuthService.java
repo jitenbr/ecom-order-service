@@ -14,7 +14,7 @@ public class AuthService
 
 
     @Autowired
-    @Qualifier("auth-service-validate")
+    @Qualifier("auth-service")
     WebClient webClient;
 
     public boolean validateToken(String token) {
@@ -23,7 +23,7 @@ public class AuthService
         log.info("Validating token within the AuthService: {}", token);
         log.info("Sending request to auth service to validate token: {}", token);
 
-        String response = webClient.get()
+        String response = webClient.get().uri("/validate")
                 .header("Authorization", token)
                 .retrieve()
                 .bodyToMono(String.class).block(); // Current Thread will pause till the final response comes back
@@ -31,4 +31,20 @@ public class AuthService
         log.info("Response from auth service: {}", response);
         return response.equalsIgnoreCase("valid");
     }
+
+    // get user id from token
+    public String getUsername(String token) {
+        log.info("Getting user id from token: {}", token);
+        log.info("Sending request to auth service to get user id: {}", token);
+        String response = webClient.get().uri("/get/user")
+                .header("Authorization", token)
+                .retrieve()
+                .bodyToMono(String.class).block(); // Current Thread will pause till the final response comes back
+        log.info("Response from auth service: {}", response);
+        return response;
+    }
+
+
+
+
 }
